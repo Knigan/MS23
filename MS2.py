@@ -59,7 +59,7 @@ def cumfreq(x):
 
     return arr
 
-def Func(z):
+def F(z):
     if (z <= 0):
         return 0
     if (z >= k):
@@ -126,10 +126,10 @@ for i in range(k + 1):
     print('|', str(i).center(6), '|', end = ' ' * 4)
 
 print()
-F = freq(X)
+Fq = freq(X)
 
 for i in range(k + 1):
-    print('|', str(F[i]).center(6), '|', end = ' ' * 4)
+    print('|', str(Fq[i]).center(6), '|', end = ' ' * 4)
 
 print()
 RF = relfreq(X)
