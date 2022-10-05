@@ -112,24 +112,24 @@ def rounding(X, num):
         arr.append(round(k, num))
     return arr
 
-def Hvecs(X, Y, width):
+def Hvecs(X, Y, width, M, m):
     arrX = X
     arrY = Y
     for i in range(len(X)):
         x = X[i]
-        if not(x + width in X):
+        if not(x + width in X) and x < M:
             arrX.append(x + width)
             arrY.append(Y[i])
-        if not(x - width in X):
+        if not(x - width in X) and x > m:
             arrX.append(x - width)
             arrY.append(Y[i])
     return (arrX, arrY)
 
-def fitting(X, Y, width, n):
+def fitting(X, Y, width, M, m, n):
     X1 = X
     Y1 = Y
     for i in range(n):
-        arrays = Hvecs(X1, Y1, width)
+        arrays = Hvecs(X1, Y1, width, M, m)
         X1 = arrays[0]
         Y1 = arrays[1]
     return (X1, Y1)
@@ -154,7 +154,7 @@ print("S^2 = %.5f" % S)
 print("Comparison: D / S^2 = %.5f is small" % (D / S))
 
 w = 0.1
-arrays = fitting(rounding(X, 1), rounding(Y, 1), w, round(2/w))
+arrays = fitting(rounding(X, 1), rounding(Y, 1), w, max(X), min(X), round(2/w))
 X1 = arrays[0]
 Y1 = arrays[1]
 
