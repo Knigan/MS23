@@ -1,5 +1,7 @@
 import math
 import random
+import matplotlib.pyplot as plt
+import numpy
 
 k = 15
 p = 0.3
@@ -70,6 +72,12 @@ def F(z):
     for i in range(len(arr)):
         if z > i and z <= i + 1:
             return arr[i]
+
+def arrF(array):
+    arr = []
+    for z in array:
+        arr.append(F(z))
+    return arr
         
 
 def Fn(x, z):
@@ -83,14 +91,24 @@ def Fn(x, z):
         if z > i and z <= i + 1:
             return arr[i]
 
-def Dn(x):
+def arrFn(x, array):
+    arr = []
+    for z in array:
+        arr.append(Fn(x, z))
+    return arr
+
+def arrDiff(x, array):
+    arr = []
+    for z in array:
+        arr.append(F(z) - Fn(x, z))
+    return arr
+
+def Dn(x, array):
     M = 0
-    u1 = cumprob()
-    u2 = cumfreq(x)
-    for i in range(k):
-        res = abs(u1[i] - u2[i])
-        if res > M:
-            M = res
+    for z in array:
+        diff = abs(F(z) - Fn(x, z))
+        if diff > M:
+            M = diff
     return M
 
 def arrprint(message, arr, precision = 8):
@@ -144,4 +162,13 @@ for i in range(k + 1):
     print('|', str("%.4f" % CF[i]).center(6), '|', end = ' ' * 4)
 
 print()
-print("Статистика Колмогорова: %.8f" % Dn(X))
+
+z = numpy.linspace(-1, 16, 1024)
+
+print("Статистика Колмогорова: %.8f" % Dn(X, z))
+
+plt.plot(z, arrF(z), linewidth = 2.0)
+plt.plot(z, arrFn(X, z), linewidth = 2.0)
+plt.xlabel("z")
+plt.ylabel("Blue: F(z)\n Orange: F160(z)")
+plt.show()
