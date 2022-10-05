@@ -35,22 +35,22 @@ def randvec():
     return y
 
 def Xvec(y):
-    x = []
+    X = []
     for k in y:
-        x.append(inv(k))
+        X.append(inv(k))
 
-    return x
+    return X
 
-def average(x):
+def average(X):
     S = 0
-    for k in x:
+    for k in X:
         S += k
     return S / n
 
-def S2(x):
+def S2(X):
     S = 0
-    av = average(x)
-    for k in x:
+    av = average(X)
+    for k in X:
         S += (k - av) ** 2
     return S / (n - 1)
 
@@ -60,23 +60,16 @@ def ind(z):
     else:
         return 0
 
-def Femp(x, z):
+def Femp(X, z):
     S = 0
-    for k in x:
+    for k in X:
         S += ind(z - k)
     return S / n
 
-def arrFemp(x, array):
+def arrFemp(X, array):
     arr = []
     for k in array:
-        arr.append(Femp(x, k))
-    return arr
-
-def getY(X, Y, array):
-    arr = []
-    for x in array:
-        if (x in X):
-            arr.append(Y[X.index(x)])
+        arr.append(Femp(X, k))
     return arr
 
 def arrprint(message, arr, precision = 5):
@@ -95,29 +88,52 @@ def arrprint(message, arr, precision = 5):
                 print("{:.{}f}".format(arr[i], precision), end = ',\n')
     print()
 
-def L(x, z, eps):
-    return Femp(x, z) - math.exp(-2 * n * eps * eps)
+def L(X, z, eps):
+    return Femp(X, z) - math.exp(-2 * n * eps * eps)
 
-def arrL(x, array, eps):
+def arrL(X, array, eps):
     arr = []
     for z in array:
-        arr.append(L(x, z, eps))
+        arr.append(L(X, z, eps))
     return arr
 
-def R(x, z, eps):
-    return Femp(x, z) + math.exp(-2 * n * eps * eps)
+def R(X, z, eps):
+    return Femp(X, z) + math.exp(-2 * n * eps * eps)
 
-def arrR(x, array, eps):
+def arrR(X, array, eps):
     arr = []
     for z in array:
-        arr.append(R(x, z, eps))
+        arr.append(R(X, z, eps))
     return arr
 
-def rounding(x, num):
+def rounding(X, num):
     arr = []
-    for k in x:
+    for k in X:
         arr.append(round(k, num))
     return arr
+
+def Hvecs(X, Y, width):
+    arrX = X
+    arrY = Y
+    for i in range(len(X)):
+        x = X[i]
+        if not(x + width in X):
+            arrX.append(x + width)
+            arrY.append(Y[i])
+        if not(x - width in X):
+            arrX.append(x - width)
+            arrY.append(Y[i])
+    return (arrX, arrY)
+
+def fitting(X, Y, width, n):
+    X1 = X
+    Y1 = Y
+    for i in range(n):
+        arrays = Hvecs(X1, Y1, width)
+        X1 = arrays[0]
+        Y1 = arrays[1]
+    return (X1, Y1)
+
 
 Y = randvec()
 arrprint("Y^T = ", Y)
@@ -137,7 +153,12 @@ print("D = exp(5/2) - exp(9/4) = %.5f" % D)
 print("S^2 = %.5f" % S)
 print("Comparison: D / S^2 = %.5f is small" % (D / S))
 
-plt.bar(rounding(X, 1), rounding(Y, 1), width = 0.1, edgecolor = "white", linewidth = 0.7)
+w = 0.1
+arrays = fitting(rounding(X, 1), rounding(Y, 1), w, round(2/w))
+X1 = arrays[0]
+Y1 = arrays[1]
+
+plt.bar(X1, Y1, width = w, edgecolor = "white", linewidth = 0.7)
 plt.show()
 
 x = numpy.linspace(-1, 12, 100)
