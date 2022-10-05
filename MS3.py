@@ -1,6 +1,5 @@
 import math
 import random
-from tkinter.messagebox import askretrycancel
 import scipy
 import numpy
 import matplotlib.pyplot as plt
@@ -114,6 +113,12 @@ def arrR(x, array, eps):
         arr.append(R(x, z, eps))
     return arr
 
+def rounding(x, num):
+    arr = []
+    for k in x:
+        arr.append(round(k, num))
+    return arr
+
 Y = randvec()
 arrprint("Y^T = ", Y)
 
@@ -132,7 +137,7 @@ print("D = exp(5/2) - exp(9/4) = %.5f" % D)
 print("S^2 = %.5f" % S)
 print("Comparison: D / S^2 = %.5f is small" % (D / S))
 
-plt.bar(X, Y, width = 0.1, edgecolor = "white", linewidth = 0.7)
+plt.bar(rounding(X, 1), rounding(Y, 1), width = 0.1, edgecolor = "white", linewidth = 0.7)
 plt.show()
 
 x = numpy.linspace(-1, 12, 100)
