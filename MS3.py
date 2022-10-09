@@ -41,15 +41,9 @@ def Xvec(y):
 
     return X
 
-def average(X):
-    S = 0
-    for k in X:
-        S += k
-    return S / n
-
 def S2(X):
     S = 0
-    av = average(X)
+    av = sum(X) / n
     for k in X:
         S += (k - av) ** 2
     return S / (n - 1)
@@ -142,7 +136,7 @@ X = Xvec(Y)
 arrprint("X^T = ", X)
 
 M = math.exp(1.125)
-av = average(X)
+av = sum(X) / n
 print("M = exp(9/8) = %.5f" % M)
 print("Average x = %.5f" % av)
 print("Comparison: M - average = %.5f is small" % (M - av))
