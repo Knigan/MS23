@@ -120,9 +120,9 @@ def Hvecs(X, Y, width, M, m):
         if not(x + width in X) and x < M:
             arrX.append(x + width)
             arrY.append(Y[i])
-        if not(x - width in X) and x > m:
-            arrX.append(x - width)
-            arrY.append(Y[i])
+        #if not(x - width in X) and x > m:
+        #    arrX.append(x - width)
+        #    arrY.append(Y[i])
     return (arrX, arrY)
 
 def fitting(X, Y, width, M, m, n):
@@ -153,12 +153,12 @@ print("D = exp(5/2) - exp(9/4) = %.5f" % D)
 print("S^2 = %.5f" % S)
 print("Comparison: D / S^2 = %.5f is small" % (D / S))
 
-w = 0.1
-arrays = fitting(rounding(X, 1), rounding(Y, 1), w, max(X), min(X), round(2/w))
+w = 1
+arrays = fitting(rounding(X, 1), rounding(Y, 1), w, max(X), min(X), 1)
 X1 = arrays[0]
 Y1 = arrays[1]
 
-plt.bar(X1, Y1, width = w, edgecolor = "white", linewidth = 0.7)
+plt.hist(Y, bins = math.trunc(math.log(n, 2)), linewidth = 0.5, edgecolor = "white")
 plt.show()
 
 x = numpy.linspace(-1, 12, 100)

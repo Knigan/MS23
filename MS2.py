@@ -103,13 +103,37 @@ def arrDiff(x, array):
         arr.append(F(z) - Fn(x, z))
     return arr
 
-def Dn(x, array):
+def Dn(x):
     M = 0
-    for z in array:
-        diff = abs(F(z) - Fn(x, z))
-        if diff > M:
-            M = diff
-    return M
+    empiric = cumfreq(x)
+    theory = cumprob()
+    for i in range(k + 1):
+        if i == 0:
+            print("Интервал: (-infty, 0]")
+        else:
+            print("Интервал: (%d, %d]" %(i - 1, i))
+        print("Эмпирическая функция распределения на данном интервале: ", empiric[i])
+        print("Теоретическая функция распределения на данном интервале: ", theory[i])
+        res = abs(empiric[i] - theory[i])
+        if res > M:
+            M = res
+        print("Модуль разницы на этом интервале: ", res)
+        print()
+
+    print("Интервал: (%d, +infty)" % k)
+    print("Эмпирическая функция распределения на данном интервале: 1")
+    print("Теоретическая функция распределения на данном интервале: 1")
+    print("Модуль разницы на этом интервале: 0")
+
+    print()
+    print("Статистика Колмогорова: %.8f" % M)
+
+def S2(X):
+    S = 0
+    av = sum(X) / n
+    for k in X:
+        S += (k - av) ** 2
+    return S / (n - 1)
 
 def arrprint(message, arr, precision = 8):
     if (precision >= 8):
@@ -140,11 +164,15 @@ arrprint("Y^T = ", Y)
 X = Xvec(Y)
 arrprint("X^T = ", X, 0)
 
+print('Значения СВ:', end = ' ' * 11)
+
 for i in range(k + 1):
     print('|', str(i).center(6), '|', end = ' ' * 4)
 
 print()
 Fq = freq(X)
+
+print('Частоты:', end = ' ' * 15)
 
 for i in range(k + 1):
     print('|', str(Fq[i]).center(6), '|', end = ' ' * 4)
@@ -152,20 +180,35 @@ for i in range(k + 1):
 print()
 RF = relfreq(X)
 
+print('Относительные частоты:', end = ' ')
+
 for i in range(k + 1):
     print('|', str("%.4f" % RF[i]).center(6), '|', end = ' ' * 4)
 
 print()
 CF = cumfreq(X)
 
+print('Накопленные частоты:', end = ' ' * 3)
+
 for i in range(k + 1):
     print('|', str("%.4f" % CF[i]).center(6), '|', end = ' ' * 4)
 
-print()
+print("\n")
+Dn(X)
+
+M = k * p
+av = sum(X) / n
+print("M = kp = %.5f" % M)
+print("Average x = %.5f" % av)
+print("Comparison: M - average = %.5f is small" % (M - av))
+
+D = k * p * (1 - p)
+S = S2(X)
+print("D = kpq = %.5f" % D)
+print("S^2 = %.5f" % S)
+print("Comparison: D / S^2 = %.5f is small" % (D / S))
 
 z = numpy.linspace(-1, 16, 1024)
-
-print("Статистика Колмогорова: %.8f" % Dn(X, z))
 
 plt.plot(z, arrF(z), linewidth = 2.0)
 plt.plot(z, arrFn(X, z), linewidth = 2.0)
