@@ -3,6 +3,7 @@ import random
 import scipy
 import numpy
 import matplotlib.pyplot as plt
+import seaborn
 
 n = 120
 
@@ -11,6 +12,12 @@ def p(x):
         return 1/x * math.sqrt(2/math.pi) * math.exp(-2*(math.log(x) - 1) ** 2)
     else:
         return 0
+
+def arrP(array):
+    arr = []
+    for x in array:
+        arr.append(p(x))
+    return arr
 
 def F(x):
     if (x > 0):
@@ -83,7 +90,14 @@ def arrprint(message, arr, precision = 5):
     print()
 
 def L(X, z, eps):
-    return Femp(X, z) - math.exp(-2 * n * eps * eps)
+    num = Femp(X, z) - math.exp(-2 * n * eps * eps)
+    if num > 0:
+        if num < 1:
+            return num
+        else:
+            return 1
+    else:
+        return 0
 
 def arrL(X, array, eps):
     arr = []
@@ -92,7 +106,14 @@ def arrL(X, array, eps):
     return arr
 
 def R(X, z, eps):
-    return Femp(X, z) + math.exp(-2 * n * eps * eps)
+    num = Femp(X, z) + math.exp(-2 * n * eps * eps)
+    if num > 0:
+        if num < 1:
+            return num
+        else:
+            return 1
+    else:
+        return 0
 
 def arrR(X, array, eps):
     arr = []
@@ -100,59 +121,105 @@ def arrR(X, array, eps):
         arr.append(R(X, z, eps))
     return arr
 
-def rounding(X, num):
-    arr = []
-    for k in X:
-        arr.append(round(k, num))
-    return arr
+while (True):
+    Y = randvec()
+    arrprint("Y^T = ", Y)
 
-def Hvecs(X, Y, width, M, m):
-    arrX = X
-    arrY = Y
-    for i in range(len(X)):
-        x = X[i]
-        if not(x + width in X) and x < M:
-            arrX.append(x + width)
-            arrY.append(Y[i])
-        #if not(x - width in X) and x > m:
-        #    arrX.append(x - width)
-        #    arrY.append(Y[i])
-    return (arrX, arrY)
+    X = Xvec(Y)
+    arrprint("X^T = ", X)
 
-def fitting(X, Y, width, M, m, n):
-    X1 = X
-    Y1 = Y
-    for i in range(n):
-        arrays = Hvecs(X1, Y1, width, M, m)
-        X1 = arrays[0]
-        Y1 = arrays[1]
-    return (X1, Y1)
+    M = math.exp(1.125)
+    av = sum(X) / n
+    
+    if abs(M - av) > 0.01:
+        continue
+    
+    D = math.exp(2.5) - math.exp(2.25)
+    S = S2(X)
 
+    if abs(D / S - 1) > 0.05:
+        continue
 
-Y = randvec()
-arrprint("Y^T = ", Y)
+    print("M = exp(9/8) = %.5f" % M)
+    print("Average x = %.5f" % av)
+    print("Comparison: M - average = %.5f is small" % (M - av))
 
-X = Xvec(Y)
-arrprint("X^T = ", X)
+    print("D = exp(5/2) - exp(9/4) = %.5f" % D)
+    print("S^2 = %.5f" % S)
+    print("Comparison: D / S^2 = %.5f is small" % (D / S))
 
-M = math.exp(1.125)
-av = sum(X) / n
-print("M = exp(9/8) = %.5f" % M)
-print("Average x = %.5f" % av)
-print("Comparison: M - average = %.5f is small" % (M - av))
+    m = min(X)
+    M = max(X)
 
-D = math.exp(2.5) - math.exp(2.25)
-S = S2(X)
-print("D = exp(5/2) - exp(9/4) = %.5f" % D)
-print("S^2 = %.5f" % S)
-print("Comparison: D / S^2 = %.5f is small" % (D / S))
+    print("Крайние члены вариационного ряда и размах выборки: %f, %f, %f" % (m, M, M - m))
 
-w = 1
-arrays = fitting(rounding(X, 1), rounding(Y, 1), w, max(X), min(X), 1)
-X1 = arrays[0]
-Y1 = arrays[1]
+    l = math.trunc(1 + math.log2(n))
+    h = (max(X) - min(X)) / l
+    print("Число интервалов и шаг интервалов группировки: %d, %f" % (l, h))
 
-plt.hist(Y, bins = math.trunc(math.log(n, 2)), linewidth = 0.5, edgecolor = "white")
+    hist = numpy.histogram(X, l)
+    values = []
+    for i in range(l):
+        values.append(0.5 * (hist[1][i] + hist[1][i + 1]))
+
+    freq = []
+    for i in range(l):
+        freq.append(hist[0][i])
+
+    relfreq = []
+    for i in range(l):
+        relfreq.append(int(hist[0][i]) / n)
+
+    f2 = []
+    for i in range(l):
+        f2.append(relfreq[i] / h)
+
+    Int = values
+    int1 = []
+    for i in Int:
+        int1.append(i - 0.5 * h)
+    int1.append(M)
+
+    print('Интервал:', end = ' ' * 14)
+
+    for i in range(l):
+        print('|', str("[%.4f; %.4f)" % (int1[i], int1[i + 1])), '|', sep = '', end = ' ' * 2)
+
+    print()
+
+    print('Середина интервала:', end = ' ' * 4)
+
+    for i in range(l):
+        print('|', str("%.4f" % (0.5 * (int1[i] + int1[i + 1]))).center(6), '|', end = ' ' * 10)
+
+    print()
+
+    print('Частоты:', end = ' ' * 15)
+
+    for i in range(l):
+        print('|', str(freq[i]).center(6), '|', end = ' ' * 10)
+
+    print()
+
+    print('Относительные частоты:', end = ' ')
+
+    for i in range(l):
+        print('|', str("%.4f" % relfreq[i]).center(6), '|', end = ' ' * 10)
+
+    print()
+
+    break
+
+plt.figure(figsize=(10,6))
+seaborn.set_style("whitegrid")
+
+x = numpy.linspace(0, math.ceil(max(hist[1])) + 1, 100)
+plt.bar(values, f2, width=h, color="grey")
+plt.plot(x, arrP(x), linewidth = 2.0, color="red")
+plt.show()
+
+plt.bar(values, f2, width=h, color="grey")
+plt.plot(values, f2, color="black")
 plt.show()
 
 x = numpy.linspace(-1, 12, 100)
@@ -160,6 +227,7 @@ plt.plot(x, arrF(x), linewidth = 2.0)
 plt.plot(x, arrFemp(X, x), linewidth = 2.0)
 
 eps = 0.1
+
 plt.plot(x, arrL(X, x, eps), linewidth = 2.0)
 plt.plot(x, arrR(X, x, eps), linewidth = 2.0)
 plt.xlabel("z")
