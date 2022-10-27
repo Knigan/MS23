@@ -146,7 +146,7 @@ while (True):
 
     print("D = exp(5/2) - exp(9/4) = %.5f" % D)
     print("S^2 = %.5f" % S)
-    print("Comparison: D / S^2 = %.5f is small" % (D / S))
+    print("Comparison: D / S^2 = %.5f is close to 1" % (D / S))
 
     m = min(X)
     M = max(X)
