@@ -5,9 +5,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as sps
 
 def arrN(X, a, sigma):
-    arr = []
-    for x in X:
-        arr.append(sps.norm.pdf(x, a, sigma))
+    arr = [sps.norm.pdf(x, a, sigma) for x in X]
     return arr
 
 n = 120
@@ -42,26 +40,16 @@ h = w / l
 print("Количество интервалов группировки l: %d" % l)
 print("Интервальный шаг h = %.5f" % h)
 
-I = []
-for i in range(l + 1):
-    I.append(m + i * h)
+I = [m + i * h for i in range(l + 1)]
 
 hist = np.histogram(X, l)
-values = []
-for i in range(l):
-    values.append(0.5 * (hist[1][i] + hist[1][i + 1]))
+values = [0.5 * (hist[1][i] + hist[1][i + 1]) for i in range(l)]
 
-freq = []
-for i in range(l):
-    freq.append(hist[0][i])
+freq = [hist[0][i] for i in range(l)]
 
-relfreq = []
-for i in range(l):
-    relfreq.append(freq[i] / n)
+relfreq = [freq[i] / n for i in range(l)]
 
-density = []
-for i in range(l):
-    density.append(relfreq[i] / h)
+density = [relfreq[i] / h for i in range(l)]
 
 print()
 
@@ -92,11 +80,12 @@ for i in range(l):
 print()
 print()
 
-plt.figure(figsize=(10,6))
 seaborn.set_style("whitegrid")
 
 x = np.linspace(m, M, 1024)
 plt.bar(values, density, width=h, color="navy")
+plt.xlabel("int")
+plt.ylabel("p^r")
 plt.show()
 
 average = np.mean(X)
@@ -108,7 +97,7 @@ print()
 print("Критерий S2")
 C2 = a0 + sps.t.ppf(1 - alpha, n - 1) * np.sqrt(s2 / n)
 print("C2 = %.5f" % C2)
-if (average > C2):
+if (average >= C2):
     print("Отвергаем гипотезу H0 в пользу гипотезы H2")
 else:
     print("Принимаем гипотезу H0")
@@ -142,4 +131,6 @@ x = np.linspace(m, M, 1024)
 plt.bar(values, density, width=h, color = "gray")
 plt.plot(x, arrN(x, a0, sigma1), color = "red", linestyle = "dotted")
 plt.plot(x, arrN(x, a1, sigma1), color = "navy", linewidth = 2.0)
+plt.xlabel("int")
+plt.ylabel("p^r")
 plt.show()
