@@ -8,6 +8,13 @@ def arrN(X, a, sigma):
     arr = [sps.norm.pdf(x, a, sigma) for x in X]
     return arr
 
+def S2(X):
+    S = 0
+    av = sum(X) / n
+    for k in X:
+        S += (k - av) ** 2
+    return S / (n - 1)
+
 n = 120
 alpha = 0.1
 a0 = -3.7
@@ -89,7 +96,7 @@ plt.ylabel("p^r")
 plt.show()
 
 average = np.mean(X)
-s2 = np.var(X)
+s2 = S2(X)
 print("Выборочное среднее: %.5f" % average)
 print("Квадрат среднеквадратичного отклонения: %.5f" % s2)
 print()
@@ -104,7 +111,7 @@ else:
 print()
 
 print("Критерий S3")
-C3 = sigma0 ** 2 / (n - 1) * sps.chi.ppf(alpha, n - 1)
+C3 = sigma0 ** 2 / (n - 1) * sps.chi2.ppf(alpha, n - 1)
 print("C3 = %.5f" % C3)
 if (s2 < C3):
     print("Отвергаем гипотезу H01 в пользу гипотезы H3")
