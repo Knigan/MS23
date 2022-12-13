@@ -1,5 +1,7 @@
 import math
 import numpy as np
+import seaborn
+import matplotlib.pyplot as plt
 
 n = 100
 m = 20000 + 10000000 // n
@@ -30,17 +32,17 @@ def D1(Int, freq):
     Sets = [(Int[i], Int[i + 1], freq[i]) for i in range(len(freq))]
     return 1 / n * max([abs(Sets[j][2] - n * SetP(Sets[j][0], Sets[j][1])) for j in range(len(Sets))])
 
+l = 1 + math.trunc(math.log2(n))
+print("Количество интервалов группировки l: %d" % l)
+
+h = 1 / l
+print("Интервальный шаг h = %.5f" % h)
+
+Int = [i * h for i in range(l + 1)]
+
+
 def Dm(sample):
     X = sample()
-
-    minX = min(X)
-    M = max(X)
-    w = M - minX
-
-    l = 1 + math.trunc(math.log2(n))
-    h = w / l
-
-    Int = [minX + i * h for i in range(l + 1)]
 
     hist = np.histogram(X, l)
 
@@ -61,13 +63,6 @@ def Dmprint(sample):
     print("Крайние члены вариационного ряда: min(X) = %.5f, max(X) = %.5f" % (minX, M))
     w = M - minX
     print("Размах выборки составляет w = %.5f" % w)
-
-    l = 1 + math.trunc(math.log2(n))
-    h = w / l
-    print("Количество интервалов группировки l: %d" % l)
-    print("Интервальный шаг h = %.5f" % h)
-
-    Int = [minX + i * h for i in range(l + 1)]
 
     hist = np.histogram(X, l)
 
@@ -110,6 +105,7 @@ def Dmprint(sample):
 
     return D1(Int, freq)
 
+
 Dmprint(sample2)
 
 D = [Dm(sample2) for i in range(m)]
@@ -125,3 +121,26 @@ print("D (A = 1) = %.5f" % Dmprint(sample1))
 print()
 print(D[:10])
 print(D[-10:])
+
+seaborn.set_style("whitegrid")
+
+IntD = [0.5 * (Int[i] + Int[i + 1]) for i in range(l)]
+
+hist = np.histogram(D, l)
+
+freq = [hist[0][i] for i in range(l)]
+
+relfreq = [freq[i] / m for i in range(l)]
+
+density = [relfreq[i] / h for i in range(l)]
+
+
+plt.bar(IntD, relfreq, width = h, color="navy")
+plt.xlabel("int")
+plt.ylabel("Относительные частоты")
+plt.show()
+
+plt.bar(IntD, density, width = h, color="navy")
+plt.xlabel("int")
+plt.ylabel("Плотность относительных частот")
+plt.show()
